@@ -20,7 +20,7 @@ const routes = [
   {
     path: '/',
     name: '导航1',
-    component: layout,
+    component: main,
     redirect:'/pageone',
     children:[
       {
@@ -39,7 +39,7 @@ const routes = [
   {
     path: '/navigation2',
     name: '导航2',
-    component: layout,
+    component: main,
     children:[
       {
         path: '/pagethree',
