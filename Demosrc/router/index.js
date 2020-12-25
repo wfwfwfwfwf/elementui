@@ -17,10 +17,10 @@ Vue.use(VueRouter)
 
 const routes = [
 
-  {
+/*  {
     path: '/',
     name: '导航1',
-    component: main,
+    component: layout,
     redirect:'/pageone',
     children:[
       {
@@ -39,7 +39,7 @@ const routes = [
   {
     path: '/navigation2',
     name: '导航2',
-    component: main,
+    component: layout,
     children:[
       {
         path: '/pagethree',
@@ -57,8 +57,66 @@ const routes = [
     path: '/profile',
     name: '主页',
     component: pageFive
-  }
+  }*/
+  {
+    path:"",
+    redirect:'/nav1'
+  },
+  {
+    path: '/nav1',
+    name: '导航1',
+    component: main,
+    // redirect:'/pageone',
+    children:[
+      {
+        path:'',
+        redirect:"pageone"
+      },
 
+      {
+        path: 'pageone',
+        name: '页面1',
+        component: pageOne
+      },
+      {
+        path: 'pagetwo',
+        name: '页面2',
+        component: pageTwo
+      }
+    ]
+  },
+
+  {
+    path: '/nav2',
+    name: '导航2',
+    component: main,
+    redirect:'/nav2/pagethree',
+    children:[
+      {
+        path: 'pagethree',
+        name: '页面3',
+        component: pageThree
+      },
+      {
+        path: 'pagefour',
+        name: '页面4',
+        component: pageFour
+      }
+    ]
+  },
+  {
+    path: '/nav3',
+    name: '导航三',
+    component: main,
+    // redirect:'/nav3/profile',
+    children:[
+      {
+        path:'profile',
+        name:'主页',
+        component:pageFive
+      }
+    ]
+  }
 ]
 
 const router = new VueRouter({
