@@ -13,6 +13,7 @@
           </el-submenu>-->
           <template v-for="(item,index) in  $router.options.routes">
             <el-submenu v-if="item.children && item.children.length > 0" :index="index+''">
+            <!--  特殊作用 <el-submenu v-if="item.children && item.children.length > 1" :index="index+''">-->
               <template slot="title">
                 <!-- <i :class="item.icon"></i>-->
                 <span slot="title">{{item.name}}</span>
