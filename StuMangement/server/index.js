@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
-const mongoose = require('mongoose')
+// const student = require('mongoose')
+const Student = require('./database')
 //跨域问题
 app.use(require('cors')())
 app.use(express.json())
@@ -23,6 +24,7 @@ app.post('/api/students',async(req,res)=>{
     res.send(student)
 })
 //3:根据ID删除学生：
+//什么时候使用req.params,后台接口必须有  :?的占位符  否则使用 req.query ★★★★★
 app.delete('/api/students/:id',async(req,res)=>{
     await Student.findByIdAndDelete(req.params.id)
     res.send({
@@ -48,6 +50,7 @@ app.get('/api/findBySnumber/:xuehao',async(req,res)=>{
 })
 //7:根据姓名模糊查询：
 app.get('/api/findByName/:names',async(req,res)=>{
+
     var query = new RegExp(req.params.names)
     // $or操作符，可以查询多个键值的任意给定值，只要满足其中一个就可返回，用于存在多个条件判定的情况下使用
     const students = await Student.find({$or:[{"name": query}]})
@@ -87,7 +90,8 @@ app.get('/api/findByName', (req,res)=>{
 })
 //分页查询列表：
 app.all('/api/studentList',(req,res,next)=>{
-
+    console.log(req.query)
+    // console.log(req.params)
     result= {
         data:[],
         total:''
@@ -117,11 +121,15 @@ app.all('/api/studentList',(req,res,next)=>{
 
 
 //数据库相关
+/*
 mongoose.connect('mongodb://localhost:27017/studentm',{
     useNewUrlParser:true,
     useFindAndModify:true,
     useCreateIndex:true,
 })
+*/
+
+/*
 const Student = mongoose.model('Student',new mongoose.Schema({
     snumber:{type:String},
     class:{type:String},
@@ -132,6 +140,7 @@ const Student = mongoose.model('Student',new mongoose.Schema({
     dblan:{type:String},
 }))
 
+*/
 
 
 app.listen(3001,()=>{
