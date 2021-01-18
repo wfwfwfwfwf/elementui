@@ -48,7 +48,9 @@
   </el-dialog>
  </transition>
     <!--  页面的大标题  -->
-    <el-header><i class="el-icon-edit" @click="fetch()">个人学生成绩管理系统</i></el-header>
+    <el-header><i class="el-icon-edit">个人学生成绩管理系统</i></el-header>
+
+
     <!--  页面form表单 :model 主要用表单验证的，也就是配合el-form的rules和el-form-item的prop来使用的。-->
     <el-form :inline="true" :model="xstudent" class="demo-form-inline" size="mini" ref="xstudent" >
       <!--  传入一个学号的规则制定 -->
@@ -66,9 +68,9 @@
          ]">
         <el-input v-model="xstudent.name" placeholder="模糊查询" ></el-input>
       </el-form-item>
-      <!--  查询按钮  -->
+      <!--  查询按钮   ruleForm是表单:model绑定的验证对象-->
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('xstudent')">查询</el-button>
+        <el-button type="primary" @click="submitForm('xstudent')">查询</el-button>
       </el-form-item>
       <!--  录入按钮  -->
       <el-form-item>
@@ -77,77 +79,22 @@
     </el-form>
 
     <!-- 表格主体显示部分   -->
-    <el-main>
-      <!-- 这里不要把所有的列的width都设置，要不然会出现空白的列，是由组件自动填充的 -->
-           <el-table :data="studentList" border style="width: 100%;">
-            <!--   column列  prop="snumber" 字段名   fixed列是否固定在左侧或者右侧，true 表示固定在左侧-->
-            <el-table-column
-              fixed
-              prop="snumber"
-              label="学号"
-              width="170"
-              style="text-align:center;justify-content: center;">
-            </el-table-column>
-
-            <el-table-column
-              prop="class"
-              label="班级">
-            </el-table-column>
-
-            <el-table-column
-              prop="name"
-              label="姓名">
-            </el-table-column>
-
-            <el-table-column
-              prop="sex"
-              label="性别">
-            </el-table-column>
-          <!-- 三科成绩 -->
-            <el-table-column
-              prop="clan"
-              label="c语言">
-            </el-table-column>
-
-            <el-table-column
-              prop="javalan"
-              label="java设计">
-            </el-table-column>
-
-            <el-table-column
-              prop="dblan"
-              label="数据库">
-            </el-table-column>
-            <!--  最后边编辑与删除按钮 -->
-            <el-table-column
-              fixed="right"
-              label="操作">
-            <!--  ？？？  -->
-              <template slot-scope="scope">
-                <el-button @click="edit(scope.row._id)" type="primary" size="mini">编辑</el-button>
-                <el-button @click="remove(scope.row._id)" type="danger" size="mini">删除</el-button>
-              </template>
-            </el-table-column>
-
-          </el-table>
-          <!-- 页脚的页码： -->
-          <!-- <div float="left" style="font-size:12px;color:info">一共有{{page.total}}条记录</div> -->
-          <div class="block" style='text-align:right;margin-top:10px'>
-            <el-pagination
-              @current-change="currentChange"
-              layout="prev, pager, next"
-              :page-size="page.size"
-              :current-page="page.current"
-              :total="page.total">
-            </el-pagination>
-          </div>
-    </el-main>
-
+    <TableMain :studentList="studentList" @edit="edit" @remove="remove"></TableMain>
+    <!--底部分页部分-->
+    <PageDvi :page="page" @currentChange="currentChange"></PageDvi>
   </el-container>
 </template>
 
 <script>
+  import PageDvi from './views/PageDvi'
+  import TableMain from './views/Main'
+
 export default {
+    components:{
+      // Main
+      PageDvi,
+      TableMain
+    },
     data() {
       return {
           /*
@@ -155,9 +102,11 @@ export default {
                   添加的学生对象
           */
           studentList:[],
+          //待查询的学生信息
           xstudent:{snumber:'', name:''},
           dialogTitle:'',
           dialogFormVisible: false,
+          //待添加的学生信息
           addstudent:{},
           formLabelWidth: '120px',
           //分页：
@@ -185,11 +134,11 @@ export default {
     },
     methods: {
       //点击回到第一页
-      fetch(){
+   /*   fetch(){
           this.xstudent.name = '';
           this.page.current = 1;
           this.pageInation();
-      },
+      },*/
       //录入学生：
       add(){
         //点击录入弹出对话框，仅仅改变标题
@@ -213,7 +162,7 @@ export default {
       },
       //删除学生：
       remove(id){
-          //${id}模板字符串
+          //${id}模板字符串     /api/students/:id   req.params.id
           this.$http.delete(`students/${id}`).then(()=>{
              this.$message({
               message: '删除学生信息成功',
@@ -225,9 +174,14 @@ export default {
       },
       //修改学生：
       edit(id){
+        // console.log('eidtStu')
           this.id = id;
           this.dialogTitle = "修改学生信息";
-          this.$http.get(`update/${id}`).then(res=>{
+          this.$http.get(`update/${id}`
+
+
+
+          ).then(res=>{
               this.addstudent = res.data
               this.dialogFormVisible = true;
           });
@@ -261,9 +215,10 @@ export default {
         this.dialogFormVisible = false;
       },
       //如何查询学生
-      onSubmit(ruleForm){
+      submitForm(ruleForm){
         if(this.xstudent.snumber!='' && this.xstudent.name ==''){
           this.$refs[ruleForm].validate((valid) => {
+            //如果通过表单校验
               if(valid) {
                 //根据学号精确查询：
                 this.$http.get(`findBySnumber/${this.xstudent.snumber}`).then(res=>{
@@ -273,7 +228,7 @@ export default {
                   this.page.total = 0;
                 })
               } else {
-                  this.message('请输入3位数字学号','error');
+                  this.message('请输入3位数字学号啊','error');
                   return false;
               }
          });
@@ -313,7 +268,14 @@ export default {
       pageInation() {
         let that = this;
         //每次点击更改页码值  ？之后的是params参数
-        this.$http.get('studentList?currentPage='+that.page.current+'&pageSize='+that.page.size).then(res=>{
+        this.$http.get('studentList',{
+          //接收时 req.query   /api/studentList
+          params:{
+          //两种写法都可
+          // currentPage='+that.page.current+'&pageSize='+that.page.size
+          currentPage:that.page.current,
+          pageSize:that.page.size
+        }}).then(res=>{
 
             if(res.data.data == null || res.data.data.length == 0){
                //除第一页的其他某页全都删除了的情况：(手动一个个删除某一页时候，会造成空页的显示错误)
